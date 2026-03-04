@@ -1,0 +1,35 @@
+app/(dashboard)/dashboard/page.tsx
+  fa30ea0a1d04bb7a 2
+auth.ts
+  fa30ea0a1d04bb7a 14
+app/api/auth/[...nextauth]/route.ts
+  fa30ea0a1d04bb7a 1-3
+lib/db.ts
+  fa30ea0a1d04bb7a 16,60
+package.json
+  fa30ea0a1d04bb7a 24,39
+app/(auth)/auth/login/page.tsx
+  fa30ea0a1d04bb7a 3,13,84-88
+lib/auth.ts
+  fa30ea0a1d04bb7a 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "aee0c8cf3d7bd206f706bba96aa4fc4b0b9bb0fc",
+  "prompts": {
+    "fa30ea0a1d04bb7a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b85f40d7-d566-4c22-a233-416f5e7822bd",
+        "model": "default"
+      },
+      "human_author": "eshuankita-art",
+      "messages": [],
+      "total_additions": 20,
+      "total_deletions": 13,
+      "accepted_lines": 20,
+      "overriden_lines": 0
+    }
+  }
+}
