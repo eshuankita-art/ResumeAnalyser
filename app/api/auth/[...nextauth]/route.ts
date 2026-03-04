@@ -48,7 +48,7 @@ export const {
   session: {
     strategy: "jwt"
   },
-  secret: serverEnv.NEXTAUTH_SECRET,
+  secret: serverEnv.NEXTAUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "dev-secret",
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

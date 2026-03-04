@@ -13,7 +13,7 @@ const ResumeAnalysisSchema = z.object({
 export type ResumeAnalysis = z.infer<typeof ResumeAnalysisSchema>;
 
 const client = new OpenAI({
-  apiKey: serverEnv.OPENAI_API_KEY
+  apiKey: serverEnv.OPENAI_API_KEY ?? ""
 });
 
 export async function analyzeResumeText(
