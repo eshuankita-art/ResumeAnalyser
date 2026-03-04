@@ -1,4 +1,6 @@
-import { sql } from "@vercel/postgres";
+import { neon } from "@neondatabase/serverless";
+
+const sql = neon(process.env.DATABASE_URL!);
 
 export interface UserRow {
   id: string;
@@ -18,16 +20,14 @@ export interface ResumeRow {
 }
 
 export async function findUserByEmail(email: string) {
-  const { rows } =
-    await sql<UserRow>`select id, email, password_hash, created_at from users where email = ${email} limit 1`;
-  return rows[0] ?? null;
+  const rows = await sql`SELECT id, email, password_hash, created_at FROM users WHERE email = ${email} LIMIT 1`;
+  return (rows[0] as UserRow | undefined) ?? null;
 }
 
 export async function createUser(email: string, passwordHash: string) {
-  const { rows } =
-    await sql<UserRow>`insert into users (email, password_hash) values (${email}, ${passwordHash}) returning id, email, password_hash, created_at`;
-  const user = rows[0];
-  await sql`insert into profiles (id) values (${user.id})`;
+  const rows = await sql`INSERT INTO users (email, password_hash) VALUES (${email}, ${passwordHash}) RETURNING id, email, password_hash, created_at`;
+  const user = rows[0] as UserRow;
+  await sql`INSERT INTO profiles (id) VALUES (${user.id})`;
   return user;
 }
 
@@ -36,21 +36,18 @@ export async function insertResume(params: {
   fileUrl: string;
   parsedText: string;
 }) {
-  const { rows } =
-    await sql<ResumeRow>`insert into resumes (user_id, file_url, parsed_text) values (${params.userId}, ${params.fileUrl}, ${params.parsedText}) returning *`;
-  return rows[0];
+  const rows = await sql`INSERT INTO resumes (user_id, file_url, parsed_text) VALUES (${params.userId}, ${params.fileUrl}, ${params.parsedText}) RETURNING *`;
+  return rows[0] as ResumeRow;
 }
 
 export async function getLatestResumeForUser(userId: string) {
-  const { rows } =
-    await sql<ResumeRow>`select * from resumes where user_id = ${userId} order by created_at desc limit 1`;
-  return rows[0] ?? null;
+  const rows = await sql`SELECT * FROM resumes WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 1`;
+  return (rows[0] as ResumeRow | undefined) ?? null;
 }
 
 export async function getResumeByIdForUser(resumeId: string, userId: string) {
-  const { rows } =
-    await sql<ResumeRow>`select * from resumes where id = ${resumeId} and user_id = ${userId} limit 1`;
-  return rows[0] ?? null;
+  const rows = await sql`SELECT * FROM resumes WHERE id = ${resumeId} AND user_id = ${userId} LIMIT 1`;
+  return (rows[0] as ResumeRow | undefined) ?? null;
 }
 
 export async function updateResumeAnalysis(params: {
@@ -59,8 +56,7 @@ export async function updateResumeAnalysis(params: {
   aiScore: number;
   aiFeedback: any;
 }) {
-  const { rows } =
-    await sql<ResumeRow>`update resumes set ai_score = ${params.aiScore}, ai_feedback = ${params.aiFeedback} where id = ${params.resumeId} and user_id = ${params.userId} returning *`;
-  return rows[0] ?? null;
+  const feedbackJson = JSON.stringify(params.aiFeedback);
+  const rows = await sql`UPDATE resumes SET ai_score = ${params.aiScore}, ai_feedback = ${feedbackJson}::jsonb WHERE id = ${params.resumeId} AND user_id = ${params.userId} RETURNING *`;
+  return (rows[0] as ResumeRow | undefined) ?? null;
 }
-

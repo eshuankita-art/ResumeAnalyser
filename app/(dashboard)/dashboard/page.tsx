@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth-config";
 import { getLatestResumeForUser } from "@/lib/db";
 import { ResumeUploadCard } from "@/components/resume-upload-card";
 import { ResumeAnalysisView } from "@/components/resume-analysis";

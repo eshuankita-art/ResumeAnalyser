@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, DragEvent } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -17,6 +18,7 @@ function SubmitButton() {
 }
 
 export function ResumeUploadCard() {
+  const router = useRouter();
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileSize, setFileSize] = useState<number | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -33,11 +35,14 @@ export function ResumeUploadCard() {
     };
   }, [previewUrl]);
 
-  if (state?.success) {
-    toast.success("Resume uploaded and parsed successfully.");
-  } else if (state && !state.success) {
-    toast.error(state.error);
-  }
+  useEffect(() => {
+    if (state?.success) {
+      toast.success("Resume uploaded and parsed successfully.");
+      router.refresh();
+    } else if (state && !state.success) {
+      toast.error(state.error);
+    }
+  }, [state, router]);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

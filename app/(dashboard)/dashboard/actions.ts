@@ -1,9 +1,7 @@
 "use server";
 
-import { Buffer } from "buffer";
 import { put } from "@vercel/blob";
 import { z } from "zod";
-import { serverEnv } from "@/lib/env";
 import { requireUser } from "@/lib/auth";
 import {
   insertResume,
@@ -34,56 +32,6 @@ export async function uploadResumeAction(
   formData: FormData
 ): Promise<UploadResult> {
   try {
-    // #region agent log
-    fetch("http://127.0.0.1:7669/ingest/ed35a363-b5ac-4ce7-a1e6-702928801c4f", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "85d3b0"
-      },
-      body: JSON.stringify({
-        sessionId: "85d3b0",
-        runId: "pre-fix",
-        hypothesisId: "H_UPLOAD_ENTRY",
-        location: "app/(dashboard)/dashboard/actions.ts:32-41",
-        message: "uploadResumeAction entry",
-        data: {
-          hasBlobToken: !!serverEnv.BLOB_READ_WRITE_TOKEN,
-          isServer: typeof window === "undefined"
-        },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    try {
-      const fs = await import("node:fs");
-      const path = await import("node:path");
-      const logLine = JSON.stringify({
-        sessionId: "85d3b0",
-        runId: "pre-fix",
-        hypothesisId: "H_UPLOAD_ENTRY_FS",
-        location: "app/(dashboard)/dashboard/actions.ts:32-65",
-        message: "uploadResumeAction entry (fs)",
-        data: {
-          hasBlobToken: !!serverEnv.BLOB_READ_WRITE_TOKEN,
-          isServer: typeof window === "undefined"
-        },
-        timestamp: Date.now()
-      });
-      const logPath = path.join(process.cwd(), ".cursor", "debug-85d3b0.log");
-      fs.appendFileSync(logPath, `${logLine}\n`, { encoding: "utf8" });
-    } catch {
-      // ignore fs logging errors
-    }
-    // #endregion
-
-    if (!serverEnv.BLOB_READ_WRITE_TOKEN) {
-      return {
-        success: false,
-        error:
-          "File storage is not configured. Please set BLOB_READ_WRITE_TOKEN."
-      };
-    }
-
     const user = await requireUser();
     const file = formData.get("file");
     const parsed = uploadSchema.safeParse({ file });
@@ -95,35 +43,16 @@ export async function uploadResumeAction(
     }
 
     const pdfFile = parsed.data.file;
-    const arrayBuffer = await pdfFile.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
     const blobPath = `resumes/${user.id}/${Date.now()}-${pdfFile.name}`;
-    // #region agent log
-    fetch("http://127.0.0.1:7669/ingest/ed35a363-b5ac-4ce7-a1e6-702928801c4f", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "85d3b0"
-      },
-      body: JSON.stringify({
-        sessionId: "85d3b0",
-        runId: "pre-fix",
-        hypothesisId: "H_BEFORE_PUT",
-        location: "app/(dashboard)/dashboard/actions.ts:59-63",
-        message: "Before put() to Vercel Blob",
-        data: {
-          blobPath,
-          bufferLength: buffer.length
-        },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
-    const { url } = await put(blobPath, buffer, {
+
+    // Upload the File directly to Vercel Blob
+    const { url } = await put(blobPath, pdfFile, {
       access: "public",
     });
 
+    // Read the file buffer for PDF text extraction
+    const arrayBuffer = await pdfFile.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
     const parsedText = await extractTextFromPdf(buffer);
 
     const resume = await insertResume({
@@ -134,46 +63,6 @@ export async function uploadResumeAction(
 
     return { success: true, resumeId: resume.id };
   } catch (error) {
-    // #region agent log
-    fetch("http://127.0.0.1:7669/ingest/ed35a363-b5ac-4ce7-a1e6-702928801c4f", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "85d3b0"
-      },
-      body: JSON.stringify({
-        sessionId: "85d3b0",
-        runId: "pre-fix",
-        hypothesisId: "H_UPLOAD_ERROR",
-        location: "app/(dashboard)/dashboard/actions.ts:117-127",
-        message: "uploadResumeAction error",
-        data: {
-          message: error instanceof Error ? error.message : String(error)
-        },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    try {
-      const fs = await import("node:fs");
-      const path = await import("node:path");
-      const logLine = JSON.stringify({
-        sessionId: "85d3b0",
-        runId: "pre-fix",
-        hypothesisId: "H_UPLOAD_ERROR_FS",
-        location: "app/(dashboard)/dashboard/actions.ts:117-127",
-        message: "uploadResumeAction error (fs)",
-        data: {
-          message: error instanceof Error ? error.message : String(error)
-        },
-        timestamp: Date.now()
-      });
-      const logPath = path.join(process.cwd(), ".cursor", "debug-85d3b0.log");
-      fs.appendFileSync(logPath, `${logLine}\n`, { encoding: "utf8" });
-    } catch {
-      // ignore fs logging errors
-    }
-    // #endregion
-
     console.error("uploadResumeAction error", error);
     const message =
       process.env.NODE_ENV === "development" && error instanceof Error
@@ -244,5 +133,3 @@ export async function analyzeResumeAction(
     };
   }
 }
-
-
