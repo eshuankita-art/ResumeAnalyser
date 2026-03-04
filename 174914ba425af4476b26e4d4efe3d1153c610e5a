@@ -1,0 +1,23 @@
+app/api/auth/[...nextauth]/route.ts
+  fa30ea0a1d04bb7a 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "174914ba425af4476b26e4d4efe3d1153c610e5a",
+  "prompts": {
+    "fa30ea0a1d04bb7a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b85f40d7-d566-4c22-a233-416f5e7822bd",
+        "model": "default"
+      },
+      "human_author": "eshuankita-art",
+      "messages": [],
+      "total_additions": 68,
+      "total_deletions": 66,
+      "accepted_lines": 68,
+      "overriden_lines": 0
+    }
+  }
+}
