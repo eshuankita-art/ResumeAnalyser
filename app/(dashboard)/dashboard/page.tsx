@@ -3,9 +3,7 @@ import { auth } from "@/app/api/auth/[...nextauth]/route";
 import { getLatestResumeForUser } from "@/lib/db";
 import { ResumeUploadCard } from "@/components/resume-upload-card";
 import { ResumeAnalysisView } from "@/components/resume-analysis";
-import { analyzeResumeAction, type AnalyzeResult } from "./actions";
-import { useFormState } from "react-dom";
-import { Button } from "@/components/ui/button";
+import { AnalyzeSection } from "./analyze-section";
 
 export const runtime = "nodejs";
 
@@ -44,24 +42,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-
-function AnalyzeSection({ resumeId }: { resumeId: string }) {
-  "use client";
-  const [state, formAction] = useFormState<AnalyzeResult | null, FormData>(
-    analyzeResumeAction,
-    null
-  );
-
-  return (
-    <form action={formAction} className="flex items-center gap-3">
-      <input type="hidden" name="resumeId" value={resumeId} />
-      <Button type="submit">
-        {state?.success ? "Re-run analysis" : "Run analysis"}
-      </Button>
-      {state && !state.success && (
-        <p className="text-xs text-destructive">{state.error}</p>
-      )}
-    </form>
-  );
-}
-

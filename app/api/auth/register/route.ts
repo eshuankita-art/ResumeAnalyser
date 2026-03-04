@@ -37,10 +37,15 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    return NextResponse.json(
-      { error: "Unable to register at this time" },
-      { status: 500 }
-    );
+    // Log for server-side debugging
+    console.error("Register error", error);
+
+    const message =
+      process.env.NODE_ENV === "development" && error instanceof Error
+        ? error.message
+        : "Unable to register at this time";
+
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
