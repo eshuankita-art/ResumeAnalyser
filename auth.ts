@@ -11,12 +11,7 @@ const credentialsSchema = z.object({
   csrfToken: z.string().optional()
 });
 
-export const {
-  auth,
-  signIn,
-  signOut,
-  handlers: { GET, POST }
-} = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
       name: "Email and Password",

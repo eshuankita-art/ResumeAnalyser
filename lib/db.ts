@@ -13,7 +13,7 @@ export interface ResumeRow {
   file_url: string;
   parsed_text: string;
   ai_score: number | null;
-  ai_feedback: unknown | null;
+  ai_feedback: any | null;
   created_at: string;
 }
 
@@ -57,7 +57,7 @@ export async function updateResumeAnalysis(params: {
   resumeId: string;
   userId: string;
   aiScore: number;
-  aiFeedback: unknown;
+  aiFeedback: any;
 }) {
   const { rows } =
     await sql<ResumeRow>`update resumes set ai_score = ${params.aiScore}, ai_feedback = ${params.aiFeedback} where id = ${params.resumeId} and user_id = ${params.userId} returning *`;
