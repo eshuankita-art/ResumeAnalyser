@@ -1,0 +1,23 @@
+auth.ts
+  fa30ea0a1d04bb7a 1-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "61352a6ff29a6144169853f88221d85f754a0dca",
+  "prompts": {
+    "fa30ea0a1d04bb7a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b85f40d7-d566-4c22-a233-416f5e7822bd",
+        "model": "default"
+      },
+      "human_author": "eshuankita-art",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 67,
+      "overriden_lines": 0
+    }
+  }
+}
